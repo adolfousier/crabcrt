@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenCrabs Signal</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; overflow: hidden; }
+canvas { display: block; width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+const text = 'OPENCRABS';
+const noiseCanvas = document.createElement('canvas');
+const nctx = noiseCanvas.getContext('2d');
+
+function renderNoise(intensity) {
+    noiseCanvas.width = W; noiseCanvas.height = H;
+    const imgData = nctx.createImageData(W, H);
+    const d = imgData.data;
+    for (let i = 0; i < d.length; i += 4) {
+        const v = Math.random() * 255 * intensity;
+        d[i] = v; d[i+1] = v; d[i+2] = v; d[i+3] = 255;
+    }
+    nctx.putImageData(imgData, 0, 0);
+}
+
+function easeInOut(t) { return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2; }
+
+const CYCLE = 12000;
+let start = performance.now();
+
+function draw(t) {
+    const cycle = (t - start) % CYCLE;
+    const phase = cycle / CYCLE;
+
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+
+    let noiseLevel, textAlpha, textTremble;
+
+    if (phase < 0.15) {
+        noiseLevel = 1; textAlpha = 0;
+    } else if (phase < 0.35) {
+        const p = (phase - 0.15) / 0.2;
+        const e = easeInOut(p);
+        noiseLevel = 1 - e * 0.85;
+        textAlpha = e;
+        textTremble = (1 - e) * 15;
+    } else if (phase < 0.75) {
+        noiseLevel = 0.15;
+        textAlpha = 1;
+        textTremble = Math.sin(t / 100) * 2;
+    } else if (phase < 0.9) {
+        const p = (phase - 0.75) / 0.15;
+        const e = easeInOut(p);
+        noiseLevel = 0.15 + e * 0.85;
+        textAlpha = 1 - e;
+        textTremble = e * 20;
+    } else {
+        noiseLevel = 1; textAlpha = 0;
+    }
+
+    renderNoise(noiseLevel);
+    ctx.drawImage(noiseCanvas, 0, 0);
+
+    if (textAlpha > 0.01) {
+        ctx.save();
+        ctx.globalAlpha = textAlpha;
+        ctx.translate(Math.random() * textTremble - textTremble/2, Math.random() * textTremble - textTremble/2);
+
+        ctx.font = `900 ${Math.min(W * 0.1, 120)}px monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // noise-textured fill instead of solid white
+        const fontSize = Math.min(W * 0.1, 120);
+        const textCanvas = document.createElement('canvas');
+        textCanvas.width = W; textCanvas.height = H;
+        const tctx = textCanvas.getContext('2d');
+        tctx.font = `900 ${fontSize}px monospace`;
+        tctx.textAlign = 'center';
+        tctx.textBaseline = 'middle';
+        tctx.fillStyle = '#fff';
+        tctx.fillText(text, W/2, H/2);
+
+        // apply noise texture to text
+        const tData = tctx.getImageData(0, 0, W, H);
+        const td = tData.data;
+        for (let i = 0; i < td.length; i += 4) {
+            if (td[i] > 128) {
+                const grain = Math.random() * 60 + 140;
+                td[i] = td[i+1] = td[i+2] = grain;
+            } else {
+                td[i+3] = 0;
+            }
+        }
+        tctx.putImageData(tData, 0, 0);
+
+        // subtle glow
+        ctx.shadowColor = 'rgba(255,255,255,0.5)';
+        ctx.shadowBlur = 15;
+        ctx.drawImage(textCanvas, 0, 0);
+
+        // RGB split duplicate layers (subtle)
+        if (textAlpha > 0.5) {
+            ctx.globalAlpha = textAlpha * 0.3;
+            ctx.shadowBlur = 0;
+            const offset = (1 - textAlpha) * 8 + 2;
+            ctx.drawImage(textCanvas, -offset, 0);
+            ctx.drawImage(textCanvas, offset, 0);
+        }
+        ctx.restore();
+    }
+
+    for (let y = 0; y < H; y += 4) {
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.fillRect(0, y, W, 2);
+    }
+
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    const grad = ctx.createRadialGradient(W/2, H/2, H*0.3, W/2, H/2, W*0.8);
+    grad.addColorStop(0, 'rgba(0,0,0,0)');
+    grad.addColorStop(1, 'rgba(0,0,0,0.6)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    if (Math.random() < 0.05) {
+        const gy = Math.random() * H;
+        const gh = Math.random() * 40 + 10;
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.fillRect(0, gy, W, gh);
+    }
+
+    requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>
