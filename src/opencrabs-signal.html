@@ -28,7 +28,7 @@ const highlights = [
     ['🛡️', 'Provider resilience', '5xx retry, proxy unwrap, 401 fix'],
     ['🔀', 'Per-session isolation', 'model swaps never bleed'],
     ['🧠', 'Self-healing expanded', '49 phantom patterns caught'],
-    ['🗣️', 'Voicebox TTS', 'new engine in onboarding'],
+    ['🔊', 'Voicebox TTS', 'new engine in onboarding'],
     ['💭', 'Thinking column', 'reasoning stored separately'],
     ['📊', 'Usage dashboard', 'centralized pricing, GLM + Kimi'],
     ['✨', 'Kimi reasoning', 'thinking mode without 400s'],
@@ -162,14 +162,11 @@ function drawGridText(items, alpha, tremble) {
         const cx = startX + col * (colW + gapX);
         const cy = startY + row * rowH;
 
+        tctx.fillStyle = '#fff';
         tctx.font = `900 ${iconSize}px monospace`;
         tctx.textAlign = 'left';
         tctx.textBaseline = 'top';
-        tctx.shadowColor = 'rgba(255,255,255,0.9)';
-        tctx.shadowBlur = 12;
-        tctx.fillStyle = '#fff';
         tctx.fillText(items[i][0], cx, cy);
-        tctx.shadowBlur = 0;
 
         tctx.font = `700 ${titleSize}px monospace`;
         tctx.fillText(items[i][1], cx + iconSize * 1.3, cy);
