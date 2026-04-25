@@ -147,16 +147,26 @@ function drawGridText(items, alpha, tremble, t) {
     const iconSize = Math.min(W * 0.045, 56);
     const titleSize = Math.min(W * 0.032, 40);
     const descSize = Math.min(W * 0.022, 28);
-    const lineH = Math.max(iconSize * 1.6, titleSize * 2.2);
+    const lineH = Math.max(iconSize * 2.4, titleSize * 3.2);
     const scrollH = items.length * lineH;
     const cycleT = (t - start) % CYCLE;
     const scrollY = H - ((cycleT / CYCLE - 0.54) / 0.21) * (scrollH + H * 0.4);
 
+    // Calculate max width for centering
+    let maxWidth = 0;
+    for (let i = 0; i < items.length; i++) {
+        tctx.font = `700 ${titleSize}px monospace`;
+        const tw = tctx.measureText(items[i][1]).width;
+        tctx.font = `400 ${descSize}px monospace`;
+        const dw = tctx.measureText(items[i][2]).width;
+        const total = iconSize * 1.3 + Math.max(tw, dw);
+        if (total > maxWidth) maxWidth = total;
+    }
+    const cx = (W - maxWidth) / 2;
+
     for (let i = 0; i < items.length; i++) {
         const cy = scrollY + i * lineH;
         if (cy < -lineH || cy > H + lineH) continue;
-
-        const cx = W * 0.12;
 
         tctx.fillStyle = '#fff';
         tctx.font = `900 ${iconSize}px monospace`;
