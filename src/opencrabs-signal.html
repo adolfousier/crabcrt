@@ -134,7 +134,7 @@ function drawTwoLineText(line1, line2, alpha, tremble, fontSize) {
     ctx.restore();
 }
 
-function drawGridText(items, alpha, tremble) {
+function drawGridText(items, alpha, tremble, t) {
     if (alpha < 0.01) return;
     ctx.save();
     ctx.globalAlpha = alpha;
@@ -144,23 +144,19 @@ function drawGridText(items, alpha, tremble) {
     textCanvas.width = W; textCanvas.height = H;
     const tctx = textCanvas.getContext('2d');
 
-    const cols = 2, rows = 4;
-    const iconSize = Math.min(W * 0.025, 28);
-    const titleSize = Math.min(W * 0.014, 17);
-    const descSize = Math.min(W * 0.011, 13);
-    const rowH = iconSize * 2.6;
-    const colW = Math.min(W * 0.22, 280);
-    const gapX = Math.min(W * 0.03, 40);
-    const gridW = colW * cols + gapX;
-    const gridH = rowH * rows;
-    const startX = (W - gridW) / 2;
-    const startY = (H - gridH) / 2;
+    const iconSize = Math.min(W * 0.045, 56);
+    const titleSize = Math.min(W * 0.032, 40);
+    const descSize = Math.min(W * 0.022, 28);
+    const lineH = Math.max(iconSize * 1.6, titleSize * 2.2);
+    const scrollH = items.length * lineH;
+    const cycleT = (t - start) % CYCLE;
+    const scrollY = H - ((cycleT / CYCLE - 0.54) / 0.21) * (scrollH + H * 0.4);
 
     for (let i = 0; i < items.length; i++) {
-        const col = i % cols;
-        const row = Math.floor(i / cols);
-        const cx = startX + col * (colW + gapX);
-        const cy = startY + row * rowH;
+        const cy = scrollY + i * lineH;
+        if (cy < -lineH || cy > H + lineH) continue;
+
+        const cx = W * 0.12;
 
         tctx.fillStyle = '#fff';
         tctx.font = `900 ${iconSize}px monospace`;
@@ -326,7 +322,7 @@ function draw(t) {
     ctx.drawImage(noiseCanvas, 0, 0);
 
     if (activeGrid) {
-        drawGridText(highlights, textAlpha, textTremble);
+        drawGridText(highlights, textAlpha, textTremble, t);
     } else if (activeTwoLine) {
         drawTwoLineText(text3Line1, text3Line2, textAlpha, textTremble, fontSize);
     } else if (activeText) {
