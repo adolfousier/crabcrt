@@ -12,8 +12,10 @@ canvas { display: block; width: 100vw; height: 100vh; }
 </head>
 <body>
 <canvas id="c"></canvas>
-<audio id="sfx" src="assets/opencrabs-release.wav" preload="auto"></audio>
+<audio id="sfx" src="assets/opencrabs-release.wav" preload="auto" crossorigin="anonymous"></audio>
 <div id="start-overlay" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#fff;font:900 24px monospace;cursor:pointer;z-index:10;">CLICK TO START</div>
+<button id="export-btn" style="position:fixed;bottom:20px;right:20px;z-index:20;background:#222;color:#fff;border:1px solid #555;padding:8px 16px;font:700 14px monospace;cursor:pointer;border-radius:4px;">🎬 Export MP4</button>
+<div id="export-status" style="position:fixed;bottom:60px;right:20px;z-index:20;background:rgba(0,0,0,0.85);color:#0f0;border:1px solid #0f0;padding:10px 16px;font:13px monospace;border-radius:4px;display:none;max-width:500px;white-space:pre-wrap;"></div>
 <script>
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
@@ -435,6 +437,44 @@ function draw(t) {
 
     requestAnimationFrame(draw);
 }
+// ── Export MP4 button ──
+const exportBtn = document.getElementById('export-btn');
+const exportStatus = document.getElementById('export-status');
+
+function showStatus(msg) {
+    exportStatus.style.display = 'block';
+    exportStatus.textContent = msg;
+}
+
+exportBtn.addEventListener('click', () => {
+    exportBtn.disabled = true;
+    exportBtn.textContent = '⏳ Recording...';
+    const duration = 37000; // slightly longer than 36s cycle to catch full loop
+    const videoStream = canvas.captureStream(60);
+    const recorder = new MediaRecorder(videoStream, {
+        mimeType: 'video/webm;codecs=vp9',
+        videoBitsPerSecond: 8000000
+    });
+    const chunks = [];
+    recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+    recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'opencrabs-v0.3.15-export.webm';
+        a.click();
+        URL.revokeObjectURL(url);
+        exportBtn.disabled = false;
+        exportBtn.textContent = '🎬 Export MP4';
+        showStatus(`✅ WebM saved!\n\nTo mux with audio:\nffmpeg -i opencrabs-v0.3.15-export.webm -i src/assets/opencrabs-release.wav -c:v copy -c:a aac opencrabs-v0.3.15.mp4`);
+        setTimeout(() => { exportStatus.style.display = 'none'; }, 30000);
+    };
+    recorder.start();
+    showStatus('🎬 Recording one cycle (~37s)...');
+    setTimeout(() => { recorder.stop(); }, duration);
+});
+
 requestAnimationFrame(draw);
 </script>
 </body>
