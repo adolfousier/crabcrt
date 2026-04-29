@@ -12,6 +12,8 @@ canvas { display: block; width: 100vw; height: 100vh; }
 </head>
 <body>
 <canvas id="c"></canvas>
+<audio id="sfx" src="assets/opencrabs-release.wav" preload="auto"></audio>
+<div id="start-overlay" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#fff;font:900 24px monospace;cursor:pointer;z-index:10;">CLICK TO START</div>
 <script>
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
@@ -21,7 +23,7 @@ resize();
 window.addEventListener('resize', resize);
 
 const text1Line1 = 'OPENCRABS';
-const text1Line2 = 'PRESENTS...';
+const text1Line2 = 'P R E S E N T S';
 const text2 = 'v0.3.15 JUST DROPPED';
 const text3Line1 = 'DOWNLOAD NOW';
 const text3Line2 = 'www.opencrabs.com';
@@ -259,9 +261,25 @@ function drawGridText(items, alpha, tremble, t) {
 }
 
 const CYCLE = 36000;
-let start = performance.now();
+let start = null;
+const audio = document.getElementById('sfx');
+const overlay = document.getElementById('start-overlay');
+
+overlay.addEventListener('click', () => {
+    overlay.style.display = 'none';
+    audio.currentTime = 0;
+    audio.play();
+    start = performance.now();
+    requestAnimationFrame(draw);
+});
+
+audio.addEventListener('ended', () => {
+    audio.currentTime = 0;
+    audio.play();
+});
 
 function draw(t) {
+    if (!start) return;
     const cycle = (t - start) % CYCLE;
     const phase = cycle / CYCLE;
 
