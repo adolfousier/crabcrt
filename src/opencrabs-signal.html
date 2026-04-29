@@ -453,30 +453,15 @@ exportBtn.addEventListener('click', async () => {
     exportBtn.disabled = true;
     exportBtn.textContent = '⏳ Recording...';
 
-    // Capture canvas video
     const videoStream = canvas.captureStream(60);
 
-    // Capture audio via AudioContext (works with local files)
-    const audioCtx = new AudioContext();
-    const audioEl = document.getElementById('sfx');
-    const source = audioCtx.createMediaElementSource(audioEl);
-    const dest = audioCtx.createMediaStreamDestination();
-    source.connect(dest);
-    source.connect(audioCtx.destination); // keep playing through speakers
-
-    const combinedStream = new MediaStream([
-        ...videoStream.getVideoTracks(),
-        ...dest.stream.getAudioTracks()
-    ]);
-
-    const recorder = new MediaRecorder(combinedStream, {
-        mimeType: 'video/webm;codecs=vp9,opus',
+    const recorder = new MediaRecorder(videoStream, {
+        mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm',
         videoBitsPerSecond: 8000000
     });
     const chunks = [];
     recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
     recorder.onstop = () => {
-        audioCtx.close();
         const blob = new Blob(chunks, { type: 'video/webm' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -486,19 +471,13 @@ exportBtn.addEventListener('click', async () => {
         URL.revokeObjectURL(url);
         exportBtn.disabled = false;
         exportBtn.textContent = '🎬 Export MP4';
-        showStatus(`✅ WebM saved with audio!\n\nTo convert to MP4:\nffmpeg -i opencrabs-v0.3.15-export.webm -c:v copy -c:a aac opencrabs-v0.3.15.mp4`);
+        showStatus('✅ WebM saved (video only)!\n\nMux with audio:\nffmpeg -i opencrabs-v0.3.15-export.webm -i src/assets/opencrabs-release.wav -c:v copy -c:a aac opencrabs-v0.3.15.mp4');
         setTimeout(() => { exportStatus.style.display = 'none'; }, 30000);
     };
 
-    // Reset audio to start of export
-    audioEl.currentTime = 0;
-    audioEl.play().catch(() => {});
-
     recorder.start();
-    showStatus('🎬 Recording one cycle (~37s)...');
-
-    // Stop after 37 seconds (animation cycle is 36s + 1s buffer)
-    setTimeout(() => { recorder.stop(); }, 37000);
+    showStatus('🎬 Recording one cycle (36s)...');
+    setTimeout(() => { recorder.stop(); }, 36000);
 });
 
 
