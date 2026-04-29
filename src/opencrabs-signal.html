@@ -266,11 +266,14 @@ const CYCLE = 36000;
 var start = null; // var so it's on window for export
 const audio = document.getElementById('sfx');
 const overlay = document.getElementById('start-overlay');
+audio.addEventListener('loadeddata', () => console.log('Audio loaded:', audio.duration.toFixed(1) + 's'));
+audio.addEventListener('error', () => console.error('Audio failed to load'));
+audio.load();
 
 overlay.addEventListener('click', () => {
     overlay.style.display = 'none';
     audio.currentTime = 0;
-    audio.play();
+    audio.play().catch(e => console.warn('Audio play failed:', e));
     start = performance.now();
     requestAnimationFrame(draw);
 });
