@@ -12,8 +12,6 @@ canvas { display: block; width: 100vw; height: 100vh; }
 </head>
 <body>
 <canvas id="c"></canvas>
-<audio id="sfx" src="assets/opencrabs-release.wav" preload="auto"></audio>
-<div id="start-overlay" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#fff;font:900 24px monospace;cursor:pointer;z-index:10;">CLICK TO START</div>
 
 
 <script>
@@ -31,7 +29,7 @@ const text3Line1 = 'DOWNLOAD NOW';
 const text3Line2 = 'www.opencrabs.com';
 const highlights = [
     ['🦙', 'Ollama native', 'first-class provider, zero config'],
-    ['⌨️', 'OpenCode CLI', 'native provider with streaming'],
+    ['⌨️', 'OpenCode Go + Zen', 'native built-in, free local completions'],
     ['💬', '/btw command', 'parallel sub-agents for side tasks'],
     ['🔍', 'browser_find', 'CSS, XPath, text, aria selectors'],
     ['🧠', 'Append-only brains', 'RSI can never erase your memory'],
@@ -263,22 +261,8 @@ function drawGridText(items, alpha, tremble, t) {
 }
 
 const CYCLE = 36000;
-let start = null;
-const audio = document.getElementById('sfx');
-const overlay = document.getElementById('start-overlay');
-
-overlay.addEventListener('click', () => {
-    overlay.style.display = 'none';
-    audio.currentTime = 0;
-    audio.play();
-    start = performance.now();
-    requestAnimationFrame(draw);
-});
-
-audio.addEventListener('ended', () => {
-    audio.currentTime = 0;
-    audio.play();
-});
+const start = performance.now();
+requestAnimationFrame(draw);
 
 function draw(t) {
     if (!start) return;
