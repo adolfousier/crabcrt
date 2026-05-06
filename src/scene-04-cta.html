@@ -140,30 +140,6 @@ function drawFrame(t) {
         drawPixelStar(sx, sy, starSize, flicker);
     }
 
-    // v0.3.17 version label — inside a top border bar, clean
-    if (t > 0.3 && t < 6) {
-        const a = easeOutCubic(Math.min((t - 0.3) / 0.4, 1)) * (t > 5 ? Math.max(0, 1 - (t - 5) / 1) : 1);
-        ctx.globalAlpha = a;
-
-        const barW = Math.min(W * 0.22, 260);
-        const barH = 30;
-        const barX = W/2 - barW/2;
-        const barY = H * 0.06;
-
-        ctx.fillStyle = '#1E2021';
-        ctx.fillRect(barX, barY, barW, barH);
-        ctx.strokeStyle = '#C86F22';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(barX, barY, barW, barH);
-
-        const lblSize = Math.min(W * 0.01, 12);
-        ctx.font = `700 ${lblSize}px 'Press Start 2P', monospace`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#C86F22';
-        ctx.fillText('v0.3.17', W/2, barY + barH/2);
-    }
-
     // Fade to black
     if (t > 5) {
         const fadeA = easeInCubic(Math.min((t - 5) / 2, 1));

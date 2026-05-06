@@ -90,68 +90,46 @@ function drawFrame(t) {
     ctx.clearRect(0, 0, W, H);
     drawCircuitGrid(t);
     
-    // Box art image slides in from top with bounce
-    if (window.imageReady && boxImg && boxImg.complete && boxImg.naturalWidth > 0) {
-        const boxW = Math.min(W * 0.30, 280);
-        const boxH = boxW * 1.5;
-        // Center box vertically with padding — final Y leaves 15% bottom margin
-        const boxYFinal = H * 0.5 - boxH / 2;
-        let boxY;
-        if (t < 1.5) {
-            boxY = -boxH + easeOutBounce(t / 1.5) * (boxYFinal + boxH);
-        } else {
-            boxY = boxYFinal + Math.sin((t - 1.5) * 0.5) * 8;
-        }
-        const boxX = W / 2 - boxW / 2;
-        
-        // Shadow
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-        ctx.fillRect(boxX + 8, boxY + 8, boxW, boxH);
-        
-        // Box with pixel border
-        ctx.drawImage(boxImg, boxX, boxY, boxW, boxH);
-        ctx.strokeStyle = '#00d4aa';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(boxX - 2, boxY - 2, boxW + 4, boxH + 4);
-    }
-    
-    // OPENCRABS title
-    if (t > 1.8 && t < 5.5) {
-        const fadeIn = easeOutCubic(Math.min((t - 1.8) / 0.5, 1));
+    // OPENCRABS title — centered middle
+    if (t > 0.5 && t < 5.5) {
+        const fadeIn = easeOutCubic(Math.min((t - 0.5) / 0.6, 1));
         const fadeOut = t > 4.8 ? Math.max(0, 1 - (t - 4.8) / 0.7) : 1;
         const alpha = fadeIn * fadeOut;
         
         ctx.globalAlpha = alpha;
-        const titleSize = Math.min(W * 0.045, 56);
+        const titleSize = Math.min(W * 0.055, 68);
         ctx.font = `900 ${titleSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
         // Glow
         ctx.shadowColor = '#00d4aa';
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = 25;
         ctx.fillStyle = '#7FFFD4';
-        ctx.fillText('OPENCRABS', W/2, H * 0.12);
+        ctx.fillText('OPENCRABS', W/2, H * 0.42);
         ctx.shadowBlur = 0;
         
         // Pixel stars around title
         const starSize = Math.min(W * 0.008, 10);
-        drawPixelStar(W * 0.22, H * 0.12, starSize, alpha * (0.5 + Math.sin(t * 3) * 0.5));
-        drawPixelStar(W * 0.78, H * 0.12, starSize, alpha * (0.5 + Math.sin(t * 3 + 1) * 0.5));
-        drawPixelStar(W * 0.28, H * 0.09, starSize * 0.7, alpha * (0.5 + Math.sin(t * 4) * 0.5));
-        drawPixelStar(W * 0.72, H * 0.09, starSize * 0.7, alpha * (0.5 + Math.sin(t * 4 + 2) * 0.5));
+        drawPixelStar(W * 0.20, H * 0.42, starSize, alpha * (0.5 + Math.sin(t * 3) * 0.5));
+        drawPixelStar(W * 0.80, H * 0.42, starSize, alpha * (0.5 + Math.sin(t * 3 + 1) * 0.5));
+        drawPixelStar(W * 0.26, H * 0.36, starSize * 0.7, alpha * (0.5 + Math.sin(t * 4) * 0.5));
+        drawPixelStar(W * 0.74, H * 0.36, starSize * 0.7, alpha * (0.5 + Math.sin(t * 4 + 2) * 0.5));
+        drawPixelStar(W * 0.30, H * 0.48, starSize * 0.6, alpha * (0.5 + Math.sin(t * 3.5) * 0.5));
+        drawPixelStar(W * 0.70, H * 0.48, starSize * 0.6, alpha * (0.5 + Math.sin(t * 3.5 + 1) * 0.5));
     }
     
     // PRESENTS
-    if (t > 3.5 && t < 5.8) {
-        const fadeIn = easeOutCubic(Math.min((t - 3.5) / 0.4, 1));
+    if (t > 2.5 && t < 5.8) {
+        const fadeIn = easeOutCubic(Math.min((t - 2.5) / 0.5, 1));
         const fadeOut = t > 5.2 ? Math.max(0, 1 - (t - 5.2) / 0.6) : 1;
         ctx.globalAlpha = fadeIn * fadeOut * 0.85;
-        const subSize = Math.min(W * 0.018, 22);
+        const subSize = Math.min(W * 0.022, 26);
         ctx.font = `700 ${subSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         ctx.fillStyle = '#C86F22';
-        ctx.fillText('P R E S E N T S', W/2, H * 0.12 + 50);
+        ctx.fillText('P R E S E N T S', W/2, H * 0.56);
     }
     
     ctx.globalAlpha = 1;

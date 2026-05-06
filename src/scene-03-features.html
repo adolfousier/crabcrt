@@ -172,63 +172,23 @@ function drawFrame(t) {
         ctx.fillText(features[i][2], tabX + 16 + iconS * 1.6, y + titleS * 1.4);
     }
 
-    // Quote bubble — inside the tab area at bottom, above the bottom bar
-    if (t > 3.5) {
-        const bubbleA = easeOutCubic(Math.min((t - 3.5) / 0.5, 1));
-        ctx.globalAlpha = bubbleA;
-
-        const bubW = Math.min(W * 0.32, 380);
-        const bubH = 56;
-        const bubX = W/2 - bubW/2;
-        const bubY = tabY + tabH - bubH - 12;
-
-        // Stepped pixel shadow
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-        ctx.fillRect(bubX + 3, bubY + 3, bubW, bubH);
-
-        // Bubble body (dark teal)
-        ctx.fillStyle = '#0D3D4B';
-        ctx.fillRect(bubX, bubY, bubW, bubH);
-        ctx.strokeStyle = '#7FFFD4';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(bubX, bubY, bubW, bubH);
-
-        // Tail pointing up (pixel style) — centered
-        const tailX = bubX + bubW/2;
-        ctx.fillStyle = '#0D3D4B';
-        ctx.fillRect(tailX - 6, bubY - 10, 12, 10);
-        ctx.strokeStyle = '#7FFFD4';
-        ctx.beginPath();
-        ctx.moveTo(tailX - 6, bubY);
-        ctx.lineTo(tailX, bubY - 10);
-        ctx.lineTo(tailX + 6, bubY);
-        ctx.stroke();
-
-        // Quote text
-        const qSize = Math.min(W * 0.007, 9);
-        ctx.font = `400 ${qSize}px 'Press Start 2P', monospace`;
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#fff';
-        ctx.fillText('"I can\'t believe it\'s', bubX + bubW/2, bubY + 20);
-        ctx.fillText('just one binary!"', bubX + bubW/2, bubY + 36);
-    }
-
-    // "WHAT'S NEW v0.3.17" header — top-left corner, above the tab
+    // "WHAT'S NEW" header — top-left, well above the tab
     if (t > 0.2) {
         const hdrA = easeOutCubic(Math.min((t - 0.2) / 0.4, 1));
         ctx.globalAlpha = hdrA;
-        const hdrSize = Math.min(W * 0.014, 16);
+        const hdrSize = Math.min(W * 0.016, 18);
         ctx.font = `900 ${hdrSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'left';
         ctx.shadowColor = '#7FFFD4';
         ctx.shadowBlur = 15;
         ctx.fillStyle = '#7FFFD4';
-        ctx.fillText('WHAT\'S NEW', tabX, tabY - 24);
+        ctx.fillText('WHAT\'S NEW', tabX, H * 0.08);
         ctx.shadowBlur = 0;
+        // Version on next line, more spacing
         ctx.fillStyle = '#C86F22';
-        const subHdrSize = Math.min(W * 0.011, 13);
+        const subHdrSize = Math.min(W * 0.012, 14);
         ctx.font = `700 ${subHdrSize}px 'Press Start 2P', monospace`;
-        ctx.fillText('v0.3.17', tabX + ctx.measureText('WHAT\'S NEW').width + 16, tabY - 24);
+        ctx.fillText('v0.3.17', tabX, H * 0.08 + hdrSize + 12);
     }
 
     // Bottom bar: 44 commits badge — below everything, clean spacing
