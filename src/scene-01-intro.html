@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scene 1 - Intro</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0f; overflow: hidden; font-family: 'Press Start 2P', monospace; }
+canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; }
+#bg { z-index: 1; }
+#main { z-index: 2; }
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<canvas id="main"></canvas>
+<script>
+const DURATION = 6;
+const bgCanvas = document.getElementById('bg');
+const mainCanvas = document.getElementById('main');
+const bgCtx = bgCanvas.getContext('2d');
+const ctx = mainCanvas.getContext('2d');
+let W, H;
+
+function resize() {
+    W = window.W || window.innerWidth; H = window.H || window.innerHeight;
+    bgCanvas.width = W; bgCanvas.height = H;
+    mainCanvas.width = W; mainCanvas.height = H;
+}
+resize();
+window.resize = resize;
+window.addEventListener('resize', resize);
+
+// Circuit grid background
+function drawCircuitGrid(t) {
+    bgCtx.fillStyle = '#0D3D4B';
+    bgCtx.fillRect(0, 0, W, H);
+    
+    const gridSize = 40;
+    bgCtx.strokeStyle = 'rgba(0,212,170,0.08)';
+    bgCtx.lineWidth = 1;
+    for (let x = 0; x < W; x += gridSize) {
+        bgCtx.beginPath(); bgCtx.moveTo(x, 0); bgCtx.lineTo(x, H); bgCtx.stroke();
+    }
+    for (let y = 0; y < H; y += gridSize) {
+        bgCtx.beginPath(); bgCtx.moveTo(0, y); bgCtx.lineTo(W, y); bgCtx.stroke();
+    }
+    
+    // Glowing circuit lines
+    bgCtx.strokeStyle = 'rgba(0,212,170,0.15)';
+    bgCtx.lineWidth = 2;
+    const offset = (t * 30) % gridSize;
+    for (let i = 0; i < 5; i++) {
+        const y = H * 0.2 + i * H * 0.15 + offset;
+        bgCtx.beginPath();
+        bgCtx.moveTo(0, y);
+        bgCtx.lineTo(W * 0.3, y);
+        bgCtx.lineTo(W * 0.3 + 20, y - 20);
+        bgCtx.lineTo(W * 0.6, y - 20);
+        bgCtx.lineTo(W * 0.6 + 20, y);
+        bgCtx.lineTo(W, y);
+        bgCtx.stroke();
+    }
+    
+    // Scanlines
+    bgCtx.fillStyle = 'rgba(0,0,0,0.06)';
+    for (let y = 0; y < H; y += 3) bgCtx.fillRect(0, y, W, 1);
+}
+
+function easeOutBounce(t) {
+    const n1=7.5625, d1=2.75;
+    if(t<1/d1) return n1*t*t;
+    else if(t<2/d1) return n1*(t-=1.5/d1)*t+0.75;
+    else if(t<2.5/d1) return n1*(t-=2.25/d1)*t+0.9375;
+    else return n1*(t-=2.625/d1)*t+0.984375;
+}
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+// Pixel stars
+function drawPixelStar(cx, cy, size, alpha) {
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#00d4aa';
+    const s = size;
+    ctx.fillRect(cx - s/2, cy - s, s, s*2);
+    ctx.fillRect(cx - s, cy - s/2, s*2, s);
+}
+
+function drawFrame(t) {
+    ctx.clearRect(0, 0, W, H);
+    drawCircuitGrid(t);
+    
+    // Box art image slides in from top with bounce
+    if (window.imageReady && boxImg && boxImg.complete && boxImg.naturalWidth > 0) {
+        const boxW = Math.min(W * 0.35, 320);
+        const boxH = boxW * 1.5;
+        let boxY;
+        if (t < 1.5) {
+            boxY = -boxH + easeOutBounce(t / 1.5) * (H * 0.5 + boxH);
+        } else {
+            boxY = H * 0.5 + Math.sin((t - 1.5) * 0.5) * 8;
+        }
+        const boxX = W / 2 - boxW / 2;
+        
+        // Shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fillRect(boxX + 8, boxY + 8, boxW, boxH);
+        
+        // Box with pixel border
+        ctx.drawImage(boxImg, boxX, boxY, boxW, boxH);
+        ctx.strokeStyle = '#00d4aa';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(boxX - 2, boxY - 2, boxW + 4, boxH + 4);
+    }
+    
+    // OPENCRABS title
+    if (t > 1.8 && t < 5.5) {
+        const fadeIn = easeOutCubic(Math.min((t - 1.8) / 0.5, 1));
+        const fadeOut = t > 4.8 ? Math.max(0, 1 - (t - 4.8) / 0.7) : 1;
+        const alpha = fadeIn * fadeOut;
+        
+        ctx.globalAlpha = alpha;
+        const titleSize = Math.min(W * 0.045, 56);
+        ctx.font = `900 ${titleSize}px 'Press Start 2P', monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Glow
+        ctx.shadowColor = '#00d4aa';
+        ctx.shadowBlur = 20;
+        ctx.fillStyle = '#7FFFD4';
+        ctx.fillText('OPENCRABS', W/2, H * 0.12);
+        ctx.shadowBlur = 0;
+        
+        // Pixel stars around title
+        const starSize = Math.min(W * 0.008, 10);
+        drawPixelStar(W * 0.22, H * 0.12, starSize, alpha * (0.5 + Math.sin(t * 3) * 0.5));
+        drawPixelStar(W * 0.78, H * 0.12, starSize, alpha * (0.5 + Math.sin(t * 3 + 1) * 0.5));
+        drawPixelStar(W * 0.28, H * 0.09, starSize * 0.7, alpha * (0.5 + Math.sin(t * 4) * 0.5));
+        drawPixelStar(W * 0.72, H * 0.09, starSize * 0.7, alpha * (0.5 + Math.sin(t * 4 + 2) * 0.5));
+    }
+    
+    // PRESENTS
+    if (t > 3.5 && t < 5.8) {
+        const fadeIn = easeOutCubic(Math.min((t - 3.5) / 0.4, 1));
+        const fadeOut = t > 5.2 ? Math.max(0, 1 - (t - 5.2) / 0.6) : 1;
+        ctx.globalAlpha = fadeIn * fadeOut * 0.85;
+        const subSize = Math.min(W * 0.018, 22);
+        ctx.font = `700 ${subSize}px 'Press Start 2P', monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#C86F22';
+        ctx.fillText('P R E S E N T S', W/2, H * 0.12 + 50);
+    }
+    
+    ctx.globalAlpha = 1;
+}
+
+// Load box art
+const boxImg = new Image();
+boxImg.id = 'boxImg';
+boxImg.src = 'assets/retro-game-opencrabs.png';
+boxImg.onload = () => { window.imageReady = true; };
+boxImg.onerror = () => { window.imageReady = false; };
+
+// Export-driven rendering: export script calls window.renderFrame(t) with exact time
+window.renderFrame = function(t) {
+    drawFrame(Math.min(t, DURATION));
+};
+window.DURATION = DURATION;
+</script>
+</body>
+</html>

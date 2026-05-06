@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scene 2 - Version Drop</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0f; overflow: hidden; font-family: 'Press Start 2P', monospace; }
+canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; }
+#bg { z-index: 1; }
+#main { z-index: 2; }
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<canvas id="main"></canvas>
+<script>
+const DURATION = 5;
+const bgCanvas = document.getElementById('bg');
+const mainCanvas = document.getElementById('main');
+const bgCtx = bgCanvas.getContext('2d');
+const ctx = mainCanvas.getContext('2d');
+let W, H;
+
+function resize() {
+    W = window.W || window.innerWidth; H = window.H || window.innerHeight;
+    bgCanvas.width = W; bgCanvas.height = H;
+    mainCanvas.width = W; mainCanvas.height = H;
+}
+resize();
+window.resize = resize;
+window.addEventListener('resize', resize);
+
+function drawCircuitGrid(t) {
+    bgCtx.fillStyle = '#0D3D4B';
+    bgCtx.fillRect(0, 0, W, H);
+    const gridSize = 40;
+    bgCtx.strokeStyle = 'rgba(0,212,170,0.08)';
+    bgCtx.lineWidth = 1;
+    for (let x = 0; x < W; x += gridSize) {
+        bgCtx.beginPath(); bgCtx.moveTo(x, 0); bgCtx.lineTo(x, H); bgCtx.stroke();
+    }
+    for (let y = 0; y < H; y += gridSize) {
+        bgCtx.beginPath(); bgCtx.moveTo(0, y); bgCtx.lineTo(W, y); bgCtx.stroke();
+    }
+    bgCtx.strokeStyle = 'rgba(0,212,170,0.15)';
+    bgCtx.lineWidth = 2;
+    const offset = (t * 30) % gridSize;
+    for (let i = 0; i < 5; i++) {
+        const y = H * 0.2 + i * H * 0.15 + offset;
+        bgCtx.beginPath();
+        bgCtx.moveTo(0, y);
+        bgCtx.lineTo(W * 0.3, y);
+        bgCtx.lineTo(W * 0.3 + 20, y - 20);
+        bgCtx.lineTo(W * 0.6, y - 20);
+        bgCtx.lineTo(W * 0.6 + 20, y);
+        bgCtx.lineTo(W, y);
+        bgCtx.stroke();
+    }
+    bgCtx.fillStyle = 'rgba(0,0,0,0.06)';
+    for (let y = 0; y < H; y += 3) bgCtx.fillRect(0, y, W, 1);
+}
+
+function easeOutElastic(t) {
+    const c4 = (2 * Math.PI) / 3;
+    return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+}
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+function drawGlitchBars(t, intensity) {
+    if (intensity <= 0) return;
+    const count = Math.floor(intensity * 12);
+    for (let i = 0; i < count; i++) {
+        const y = Math.random() * H;
+        const h = 2 + Math.random() * 8;
+        const w = W * (0.1 + Math.random() * 0.3);
+        const x = Math.random() * (W - w);
+        ctx.globalAlpha = intensity * 0.3;
+        ctx.fillStyle = Math.random() > 0.5 ? '#7FFFD4' : '#C86F22';
+        ctx.fillRect(x, y, w, h);
+    }
+    ctx.globalAlpha = 1;
+}
+
+function drawFrame(t) {
+    ctx.clearRect(0, 0, W, H);
+    drawCircuitGrid(t);
+    
+    // Glitch bars during version entrance
+    if (t > 0.3 && t < 2.0) {
+        const glitchIntensity = Math.max(0, 1 - (t - 0.3) / 1.2);
+        drawGlitchBars(t, glitchIntensity);
+    }
+    
+    // "v0.3.17" elastic entrance
+    if (t > 0.3 && t < 4.5) {
+        const fadeIn = easeOutElastic(Math.min((t - 0.3) / 0.8, 1));
+        const fadeOut = t > 3.8 ? Math.max(0, 1 - (t - 3.8) / 0.7) : 1;
+        const alpha = fadeIn * fadeOut;
+        
+        ctx.globalAlpha = alpha;
+        const vSize = Math.min(W * 0.06, 72);
+        ctx.font = `900 ${vSize}px 'Press Start 2P', monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Shadow layer
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillText('v0.3.17', W/2 + 4, H * 0.45 + 4);
+        
+        // Glow
+        ctx.shadowColor = '#7FFFD4';
+        ctx.shadowBlur = 25;
+        ctx.fillStyle = '#7FFFD4';
+        ctx.fillText('v0.3.17', W/2, H * 0.45);
+        ctx.shadowBlur = 0;
+    }
+    
+    // "JUST DROPPED" subtitle
+    if (t > 1.2 && t < 4.5) {
+        const fadeIn = easeOutCubic(Math.min((t - 1.2) / 0.5, 1));
+        const fadeOut = t > 3.8 ? Math.max(0, 1 - (t - 3.8) / 0.7) : 1;
+        ctx.globalAlpha = fadeIn * fadeOut;
+        const subSize = Math.min(W * 0.02, 24);
+        ctx.font = `700 ${subSize}px 'Press Start 2P', monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#C86F22';
+        ctx.fillText('JUST DROPPED', W/2, H * 0.45 + 60);
+    }
+    
+    // Pixel decoration bars top and bottom
+    ctx.globalAlpha = 0.6;
+    ctx.fillStyle = '#C86F22';
+    const barH = 4;
+    ctx.fillRect(0, H * 0.3, W, barH);
+    ctx.fillRect(0, H * 0.62, W, barH);
+    ctx.globalAlpha = 1;
+    
+    // 44 commits badge
+    if (t > 2.0 && t < 4.5) {
+        const fadeIn = easeOutCubic(Math.min((t - 2.0) / 0.4, 1));
+        const fadeOut = t > 3.8 ? Math.max(0, 1 - (t - 3.8) / 0.7) : 1;
+        ctx.globalAlpha = fadeIn * fadeOut;
+        
+        const badgeW = Math.min(W * 0.25, 280);
+        const badgeH = 40;
+        const badgeX = W/2 - badgeW/2;
+        const badgeY = H * 0.65;
+        
+        // Pixel shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fillRect(badgeX + 4, badgeY + 4, badgeW, badgeH);
+        
+        // Badge
+        ctx.fillStyle = '#1E2021';
+        ctx.fillRect(badgeX, badgeY, badgeW, badgeH);
+        ctx.strokeStyle = '#00d4aa';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(badgeX, badgeY, badgeW, badgeH);
+        
+        const badgeSize = Math.min(W * 0.012, 14);
+        ctx.font = `700 ${badgeSize}px 'Press Start 2P', monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#fff';
+        ctx.fillText('44 COMMITS', W/2, badgeY + badgeH/2);
+    }
+    
+    ctx.globalAlpha = 1;
+}
+
+// Export-driven rendering: export script calls window.renderFrame(t) with exact time
+window.renderFrame = function(t) {
+    drawFrame(Math.min(t, DURATION));
+};
+window.DURATION = DURATION;
+</script>
+</body>
+</html>

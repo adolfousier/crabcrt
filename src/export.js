@@ -4,9 +4,16 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 (async () => {
-    const DURATION = 36000; // 36 seconds in ms
-    const WIDTH = 1920;
-    const HEIGHT = 1080;
+    const FPS = 30;
+    const DURATION = 36;
+    const WIDTH = 1280;
+    const HEIGHT = 720;
+    const TOTAL_FRAMES = FPS * DURATION;
+    const FRAME_DIR = path.join(__dirname, '..', 'tmp-frames');
+
+    // Clean up old frames
+    if (fs.existsSync(FRAME_DIR)) fs.rmSync(FRAME_DIR, { recursive: true });
+    fs.mkdirSync(FRAME_DIR, { recursive: true });
 
     console.log('Launching browser...');
     const browser = await puppeteer.launch({
@@ -15,7 +22,6 @@ const { execSync } = require('child_process');
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
-            '--autoplay-policy=no-user-gesture-required',
             '--window-size=1920,1080'
         ],
         defaultViewport: { width: WIDTH, height: HEIGHT }
@@ -25,88 +31,55 @@ const { execSync } = require('child_process');
     await page.setViewport({ width: WIDTH, height: HEIGHT });
 
     const htmlPath = path.join(__dirname, 'opencrabs-signal.html');
-    await page.goto('file://' + htmlPath, { waitUntil: 'networkidle0' });
+    const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+    await page.setContent(htmlContent, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
-    // Force canvas to exact dimensions
+    // Force canvas size and start animation
     await page.evaluate((w, h) => {
         const canvas = document.getElementById('c');
-        canvas.width = w;
-        canvas.height = h;
-        window.dispatchEvent(new Event('resize'));
+        if (canvas) {
+            canvas.width = w;
+            canvas.height = h;
+            window.dispatchEvent(new Event('resize'));
+        }
     }, WIDTH, HEIGHT);
-    await new Promise(r => setTimeout(r, 100));
+    await new Promise(r => setTimeout(r, 300));
 
-    // Start recording via MediaRecorder in the page
-    console.log('Starting MediaRecorder...');
-    const webmPath = await page.evaluate(async (duration) => {
-        return new Promise((resolve) => {
-            const canvas = document.getElementById('c');
-            const stream = canvas.captureStream(30);
-            const recorder = new MediaRecorder(stream, {
-                mimeType: 'video/webm;codecs=vp9',
-                videoBitsPerSecond: 8000000
-            });
+    // Click overlay if it exists, otherwise the animation auto-starts
+    const hasOverlay = await page.evaluate(() => !!document.getElementById('start-overlay'));
+    if (hasOverlay) {
+        await page.click('#start-overlay');
+        await new Promise(r => setTimeout(r, 300));
+    }
 
-            const chunks = [];
-            recorder.ondataavailable = (e) => {
-                if (e.data.size > 0) chunks.push(e.data);
-            };
+    console.log(`Capturing ${TOTAL_FRAMES} frames at ${FPS}fps...`);
+    for (let i = 0; i < TOTAL_FRAMES; i++) {
+        // Render frame at specific timestamp using renderFrameAt if available
+        await page.evaluate((ms) => {
+            if (typeof window.renderFrameAt === 'function') {
+                window.renderFrameAt(ms);
+            }
+        }, (i / FPS) * 1000);
 
-            recorder.onstop = () => {
-                const blob = new Blob(chunks, { type: 'video/webm' });
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    resolve(reader.result);
-                };
-                reader.readAsDataURL(blob);
-            };
+        const framePath = path.join(FRAME_DIR, `frame_${String(i).padStart(5, '0')}.png`);
+        await page.screenshot({ path: framePath, clip: { x: 0, y: 0, width: WIDTH, height: HEIGHT } });
 
-            // Start animation and recording
-            document.getElementById('start-overlay').click();
-            recorder.start();
-
-            // Stop after duration
-            setTimeout(() => {
-                recorder.stop();
-            }, duration);
-        });
-    }, DURATION);
+        if (i % 100 === 0) console.log(`  Frame ${i}/${TOTAL_FRAMES}`);
+    }
 
     await browser.close();
 
-    // Save webm
-    const base64Data = webmPath.replace(/^data:video\/webm;base64,/, '');
-    const webmBuffer = Buffer.from(base64Data, 'base64');
-    const webmFile = path.join(__dirname, '..', 'tmp-export.webm');
-    fs.writeFileSync(webmFile, webmBuffer);
+    // Encode MP4
+    const outputPath = path.join(__dirname, '..', 'opencrabs-v0.3.16.mp4');
+    console.log('Encoding with ffmpeg...');
+    execSync(
+        `ffmpeg -y -framerate ${FPS} -i "${FRAME_DIR}/frame_%05d.png" ` +
+        `-c:v libx264 -pix_fmt yuv420p -crf 20 -preset fast -movflags +faststart "${outputPath}"`,
+        { stdio: 'inherit' }
+    );
 
-    console.log(`WebM saved: ${webmFile} (${(webmBuffer.length / 1024 / 1024).toFixed(1)} MB)`);
-
-    // Mux with audio using ffmpeg
-    const audioPath = path.join(__dirname, 'assets', 'opencrabs-release.wav');
-    const outputPath = path.join(__dirname, '..', 'opencrabs-v0.3.15.mp4');
-
-    console.log('Muxing with ffmpeg...');
-    const ffmpegCmd = [
-        'ffmpeg', '-y',
-        '-i', webmFile,
-        '-i', audioPath,
-        '-r', '30',
-        '-c:v', 'libx264',
-        '-pix_fmt', 'yuv420p',
-        '-crf', '23',
-        '-preset', 'fast',
-        '-c:a', 'aac',
-        '-b:a', '192k',
-        '-movflags', '+faststart',
-        '-shortest',
-        outputPath
-    ];
-
-    execSync(ffmpegCmd.join(' '), { stdio: 'inherit' });
-
-    // Cleanup
-    fs.unlinkSync(webmFile);
+    // Clean up frames
+    fs.rmSync(FRAME_DIR, { recursive: true });
 
     const stats = fs.statSync(outputPath);
     console.log(`Done! ${outputPath}`);
