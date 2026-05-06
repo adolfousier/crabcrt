@@ -76,7 +76,7 @@ function startServer(dir, port) {
 
         // Wait for web fonts (Press Start 2P) to fully load before capturing
         await page.evaluate(() => document.fonts.ready);
-        await sleep(800);
+        await sleep(1500); // extra buffer for headless canvas font application
 
         // Verify canvas dimensions
         const dims = await page.evaluate(() => {
