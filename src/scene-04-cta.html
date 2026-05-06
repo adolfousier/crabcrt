@@ -63,12 +63,13 @@ function drawFrame(t) {
     ctx.clearRect(0, 0, W, H);
     drawCircuitGrid(t);
 
-    // Box art centered, slightly smaller
+    // Box art centered, balanced spacing top and bottom
     if (window.imageReady && boxImg && boxImg.complete && boxImg.naturalWidth > 0) {
-        const boxW = Math.min(W * 0.22, 240);
+        const boxW = Math.min(W * 0.20, 220);
         const boxH = boxW * 1.5;
         const boxX = W/2 - boxW/2;
-        const boxY = H * 0.35 - boxH/2 + Math.sin(t * 0.5) * 5;
+        // Place box at 30% from top, leaving room for CTA below with equal spacing
+        const boxY = H * 0.28 - boxH/2 + Math.sin(t * 0.5) * 5;
 
         ctx.fillStyle = 'rgba(0,0,0,0.4)';
         ctx.fillRect(boxX + 6, boxY + 6, boxW, boxH);
@@ -86,11 +87,11 @@ function drawFrame(t) {
 
         ctx.globalAlpha = alpha;
 
-        // CTA box
+        // CTA box — positioned closer to box for balanced spacing
         const ctaW = Math.min(W * 0.45, 500);
         const ctaH = 60;
         const ctaX = W/2 - ctaW/2;
-        const ctaY = H * 0.72;
+        const ctaY = H * 0.62;
 
         // Pixel shadow
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
@@ -123,7 +124,7 @@ function drawFrame(t) {
         ctx.fillStyle = '#7FFFD4';
         ctx.shadowColor = '#7FFFD4';
         ctx.shadowBlur = 10;
-        ctx.fillText('www.opencrabs.com', W/2, H * 0.72 + 90);
+        ctx.fillText('www.opencrabs.com', W/2, H * 0.62 + 80);
         ctx.shadowBlur = 0;
     }
 
@@ -138,15 +139,17 @@ function drawFrame(t) {
         drawPixelStar(sx, sy, starSize, flicker);
     }
 
-    // v0.3.17 label
+    // v0.3.17 label — properly centered inside top area with padding
     if (t > 0.3 && t < 6) {
         const a = easeOutCubic(Math.min((t - 0.3) / 0.4, 1)) * (t > 5 ? Math.max(0, 1 - (t - 5) / 1) : 1);
         ctx.globalAlpha = a;
-        const lblSize = Math.min(W * 0.01, 12);
+        const lblSize = Math.min(W * 0.012, 14);
         ctx.font = `700 ${lblSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         ctx.fillStyle = '#C86F22';
-        ctx.fillText('v0.3.17', W/2, H * 0.12);
+        // Position at 15% from top with clear padding from edge
+        ctx.fillText('v0.3.17', W/2, H * 0.15);
     }
 
     // Fade to black

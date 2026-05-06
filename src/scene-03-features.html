@@ -172,15 +172,15 @@ function drawFrame(t) {
         ctx.fillText(features[i][2], tabX + 16 + iconS * 1.6, y + titleS * 1.4);
     }
 
-    // Quote bubble (right side, like the reference)
+    // Quote bubble — positioned below the features tab, centered
     if (t > 3.5) {
         const bubbleA = easeOutCubic(Math.min((t - 3.5) / 0.5, 1));
         ctx.globalAlpha = bubbleA;
 
-        const bubW = Math.min(W * 0.22, 260);
-        const bubH = 70;
-        const bubX = tabX + tabW + 16;
-        const bubY = H * 0.2;
+        const bubW = Math.min(W * 0.35, 400);
+        const bubH = 64;
+        const bubX = W/2 - bubW/2;
+        const bubY = tabY + tabH + 16;
 
         // Stepped pixel shadow
         ctx.fillStyle = 'rgba(0,0,0,0.3)';
@@ -193,23 +193,24 @@ function drawFrame(t) {
         ctx.lineWidth = 2;
         ctx.strokeRect(bubX, bubY, bubW, bubH);
 
-        // Tail (pixel style)
+        // Tail pointing up (pixel style) — centered
+        const tailX = bubX + bubW/2;
         ctx.fillStyle = '#0D3D4B';
-        ctx.fillRect(bubX - 12, bubY + bubH - 16, 14, 16);
+        ctx.fillRect(tailX - 7, bubY - 14, 14, 14);
         ctx.strokeStyle = '#7FFFD4';
         ctx.beginPath();
-        ctx.moveTo(bubX, bubY + bubH - 16);
-        ctx.lineTo(bubX - 12, bubY + bubH - 16);
-        ctx.lineTo(bubX, bubY + bubH);
+        ctx.moveTo(tailX - 7, bubY);
+        ctx.lineTo(tailX, bubY - 14);
+        ctx.lineTo(tailX + 7, bubY);
         ctx.stroke();
 
         // Quote text
-        const qSize = Math.min(W * 0.007, 9);
+        const qSize = Math.min(W * 0.008, 10);
         ctx.font = `400 ${qSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'center';
         ctx.fillStyle = '#fff';
-        ctx.fillText('"I can\'t believe it\'s', bubX + bubW/2, bubY + 24);
-        ctx.fillText('just one binary!"', bubX + bubW/2, bubY + 42);
+        ctx.fillText('"I can\'t believe it\'s', bubX + bubW/2, bubY + 22);
+        ctx.fillText('just one binary!"', bubX + bubW/2, bubY + 40);
 
         // Tiny crab icon below quote
         ctx.fillStyle = '#C86F22';
