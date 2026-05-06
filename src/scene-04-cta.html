@@ -63,13 +63,18 @@ function drawFrame(t) {
     ctx.clearRect(0, 0, W, H);
     drawCircuitGrid(t);
 
-    // Box art centered, balanced spacing top and bottom
+    // All elements centered as a vertical group
+    // Total group: box (~300px) + gap(40) + CTA(60) + gap(20) + URL(~20) = ~440px
+    // Center that group in the viewport
+    const groupH = 420;
+    const groupTop = H/2 - groupH/2;
+
+    // Box art
     if (window.imageReady && boxImg && boxImg.complete && boxImg.naturalWidth > 0) {
-        const boxW = Math.min(W * 0.20, 220);
+        const boxW = Math.min(W * 0.18, 200);
         const boxH = boxW * 1.5;
         const boxX = W/2 - boxW/2;
-        // Place box at 30% from top, leaving room for CTA below with equal spacing
-        const boxY = H * 0.28 - boxH/2 + Math.sin(t * 0.5) * 5;
+        const boxY = groupTop + Math.sin(t * 0.5) * 5;
 
         ctx.fillStyle = 'rgba(0,0,0,0.4)';
         ctx.fillRect(boxX + 6, boxY + 6, boxW, boxH);
@@ -87,24 +92,20 @@ function drawFrame(t) {
 
         ctx.globalAlpha = alpha;
 
-        // CTA box — positioned closer to box for balanced spacing
-        const ctaW = Math.min(W * 0.45, 500);
-        const ctaH = 60;
+        const ctaW = Math.min(W * 0.40, 460);
+        const ctaH = 56;
         const ctaX = W/2 - ctaW/2;
-        const ctaY = H * 0.62;
+        const ctaY = groupTop + 320;
 
-        // Pixel shadow
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
         ctx.fillRect(ctaX + 4, ctaY + 4, ctaW, ctaH);
-
-        // CTA background (orange)
         ctx.fillStyle = '#C86F22';
         ctx.fillRect(ctaX, ctaY, ctaW, ctaH);
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 3;
         ctx.strokeRect(ctaX, ctaY, ctaW, ctaH);
 
-        const ctaSize = Math.min(W * 0.018, 22);
+        const ctaSize = Math.min(W * 0.016, 20);
         ctx.font = `900 ${ctaSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -118,13 +119,13 @@ function drawFrame(t) {
         const fadeOut = t > 5 ? Math.max(0, 1 - (t - 5) / 1) : 1;
         ctx.globalAlpha = fadeIn * fadeOut;
 
-        const urlSize = Math.min(W * 0.012, 14);
+        const urlSize = Math.min(W * 0.011, 13);
         ctx.font = `400 ${urlSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'center';
         ctx.fillStyle = '#7FFFD4';
         ctx.shadowColor = '#7FFFD4';
         ctx.shadowBlur = 10;
-        ctx.fillText('www.opencrabs.com', W/2, H * 0.62 + 80);
+        ctx.fillText('www.opencrabs.com', W/2, groupTop + 400);
         ctx.shadowBlur = 0;
     }
 
@@ -132,24 +133,35 @@ function drawFrame(t) {
     const starSize = Math.min(W * 0.006, 8);
     for (let i = 0; i < 8; i++) {
         const angle = (t * 0.3) + (i * Math.PI * 2 / 8);
-        const radius = W * 0.25;
+        const radius = W * 0.28;
         const sx = W/2 + Math.cos(angle) * radius;
-        const sy = H * 0.5 + Math.sin(angle) * radius * 0.5;
+        const sy = H/2 + Math.sin(angle) * radius * 0.5;
         const flicker = 0.3 + Math.sin(t * 2 + i) * 0.3;
         drawPixelStar(sx, sy, starSize, flicker);
     }
 
-    // v0.3.17 label — properly centered inside top area with padding
+    // v0.3.17 version label — inside a top border bar, clean
     if (t > 0.3 && t < 6) {
         const a = easeOutCubic(Math.min((t - 0.3) / 0.4, 1)) * (t > 5 ? Math.max(0, 1 - (t - 5) / 1) : 1);
         ctx.globalAlpha = a;
-        const lblSize = Math.min(W * 0.012, 14);
+
+        const barW = Math.min(W * 0.22, 260);
+        const barH = 30;
+        const barX = W/2 - barW/2;
+        const barY = H * 0.06;
+
+        ctx.fillStyle = '#1E2021';
+        ctx.fillRect(barX, barY, barW, barH);
+        ctx.strokeStyle = '#C86F22';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(barX, barY, barW, barH);
+
+        const lblSize = Math.min(W * 0.01, 12);
         ctx.font = `700 ${lblSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = '#C86F22';
-        // Position at 15% from top with clear padding from edge
-        ctx.fillText('v0.3.17', W/2, H * 0.15);
+        ctx.fillText('v0.3.17', W/2, barY + barH/2);
     }
 
     // Fade to black

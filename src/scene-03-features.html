@@ -110,10 +110,10 @@ function drawFrame(t) {
 
     // RIGHT SIDE: Pop-out tab with features (Game Boy manual style)
     const tabSlide = easeOutCubic(Math.min(t / 0.8, 1));
-    const tabW = Math.min(W * 0.52, 600);
-    const tabH = H * 0.72;
-    const tabX = W * 0.42 - (1 - tabSlide) * W * 0.1;
-    const tabY = H * 0.14;
+    const tabW = Math.min(W * 0.50, 580);
+    const tabH = H * 0.60;
+    const tabX = W * 0.44 - (1 - tabSlide) * W * 0.1;
+    const tabY = H * 0.22;
 
     // Tab background (dark charcoal like the manual insert)
     ctx.fillStyle = '#1E2021';
@@ -172,19 +172,19 @@ function drawFrame(t) {
         ctx.fillText(features[i][2], tabX + 16 + iconS * 1.6, y + titleS * 1.4);
     }
 
-    // Quote bubble — positioned below the features tab, centered
+    // Quote bubble — inside the tab area at bottom, above the bottom bar
     if (t > 3.5) {
         const bubbleA = easeOutCubic(Math.min((t - 3.5) / 0.5, 1));
         ctx.globalAlpha = bubbleA;
 
-        const bubW = Math.min(W * 0.35, 400);
-        const bubH = 64;
+        const bubW = Math.min(W * 0.32, 380);
+        const bubH = 56;
         const bubX = W/2 - bubW/2;
-        const bubY = tabY + tabH + 16;
+        const bubY = tabY + tabH - bubH - 12;
 
         // Stepped pixel shadow
-        ctx.fillStyle = 'rgba(0,0,0,0.3)';
-        ctx.fillRect(bubX + 4, bubY + 4, bubW, bubH);
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fillRect(bubX + 3, bubY + 3, bubW, bubH);
 
         // Bubble body (dark teal)
         ctx.fillStyle = '#0D3D4B';
@@ -196,55 +196,50 @@ function drawFrame(t) {
         // Tail pointing up (pixel style) — centered
         const tailX = bubX + bubW/2;
         ctx.fillStyle = '#0D3D4B';
-        ctx.fillRect(tailX - 7, bubY - 14, 14, 14);
+        ctx.fillRect(tailX - 6, bubY - 10, 12, 10);
         ctx.strokeStyle = '#7FFFD4';
         ctx.beginPath();
-        ctx.moveTo(tailX - 7, bubY);
-        ctx.lineTo(tailX, bubY - 14);
-        ctx.lineTo(tailX + 7, bubY);
+        ctx.moveTo(tailX - 6, bubY);
+        ctx.lineTo(tailX, bubY - 10);
+        ctx.lineTo(tailX + 6, bubY);
         ctx.stroke();
 
         // Quote text
-        const qSize = Math.min(W * 0.008, 10);
+        const qSize = Math.min(W * 0.007, 9);
         ctx.font = `400 ${qSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'center';
         ctx.fillStyle = '#fff';
-        ctx.fillText('"I can\'t believe it\'s', bubX + bubW/2, bubY + 22);
-        ctx.fillText('just one binary!"', bubX + bubW/2, bubY + 40);
-
-        // Tiny crab icon below quote
-        ctx.fillStyle = '#C86F22';
-        ctx.font = `${Math.min(W*0.012, 14)}px 'Press Start 2P', monospace`;
-        ctx.fillText('🦀', bubX + bubW/2, bubY + bubH - 6);
+        ctx.fillText('"I can\'t believe it\'s', bubX + bubW/2, bubY + 20);
+        ctx.fillText('just one binary!"', bubX + bubW/2, bubY + 36);
     }
 
-    // "WHAT'S NEW v0.3.17" header at top
+    // "WHAT'S NEW v0.3.17" header — top-left corner, above the tab
     if (t > 0.2) {
         const hdrA = easeOutCubic(Math.min((t - 0.2) / 0.4, 1));
         ctx.globalAlpha = hdrA;
-        const hdrSize = Math.min(W * 0.016, 18);
+        const hdrSize = Math.min(W * 0.014, 16);
         ctx.font = `900 ${hdrSize}px 'Press Start 2P', monospace`;
-        ctx.textAlign = 'center';
+        ctx.textAlign = 'left';
         ctx.shadowColor = '#7FFFD4';
         ctx.shadowBlur = 15;
         ctx.fillStyle = '#7FFFD4';
-        ctx.fillText('WHAT\'S NEW', W/2, H * 0.07);
+        ctx.fillText('WHAT\'S NEW', tabX, tabY - 24);
         ctx.shadowBlur = 0;
         ctx.fillStyle = '#C86F22';
-        const subHdrSize = Math.min(W * 0.012, 14);
+        const subHdrSize = Math.min(W * 0.011, 13);
         ctx.font = `700 ${subHdrSize}px 'Press Start 2P', monospace`;
-        ctx.fillText('v0.3.17', W/2, H * 0.07 + 28);
+        ctx.fillText('v0.3.17', tabX + ctx.measureText('WHAT\'S NEW').width + 16, tabY - 24);
     }
 
-    // Bottom bar: 44 commits badge
+    // Bottom bar: 44 commits badge — below everything, clean spacing
     if (t > 2.5) {
         const badgeA = easeOutCubic(Math.min((t - 2.5) / 0.4, 1));
         ctx.globalAlpha = badgeA;
 
-        const badgeW = Math.min(W * 0.3, 340);
-        const badgeH = 32;
+        const badgeW = Math.min(W * 0.35, 400);
+        const badgeH = 30;
         const badgeX = W/2 - badgeW/2;
-        const badgeY = H * 0.92;
+        const badgeY = H * 0.90;
 
         ctx.fillStyle = 'rgba(0,0,0,0.4)';
         ctx.fillRect(badgeX + 3, badgeY + 3, badgeW, badgeH);
@@ -254,11 +249,12 @@ function drawFrame(t) {
         ctx.lineWidth = 2;
         ctx.strokeRect(badgeX, badgeY, badgeW, badgeH);
 
-        const bSize = Math.min(W * 0.009, 11);
+        const bSize = Math.min(W * 0.008, 10);
         ctx.font = `700 ${bSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         ctx.fillStyle = '#fff';
-        ctx.fillText('44 COMMITS  •  28 FIXES  •  7 FEATURES', W/2, badgeY + badgeH/2 + 2);
+        ctx.fillText('44 COMMITS  •  28 FIXES  •  7 FEATURES', W/2, badgeY + badgeH/2);
     }
 
     ctx.globalAlpha = 1;
