@@ -74,8 +74,9 @@ function startServer(dir, port) {
             if (typeof window.resize === 'function') window.resize();
         }, WIDTH, HEIGHT);
 
-        // Wait for fonts + image to load
-        await sleep(1500);
+        // Wait for web fonts (Press Start 2P) to fully load before capturing
+        await page.evaluate(() => document.fonts.ready);
+        await sleep(800);
 
         // Verify canvas dimensions
         const dims = await page.evaluate(() => {
