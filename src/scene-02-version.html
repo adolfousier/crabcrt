@@ -95,7 +95,7 @@ function drawFrame(t) {
         drawGlitchBars(t, glitchIntensity);
     }
     
-    // "v0.3.17" elastic entrance
+    // "v0.3.18" elastic entrance
     if (t > 0.3 && t < 4.5) {
         const fadeIn = easeOutElastic(Math.min((t - 0.3) / 0.8, 1));
         const fadeOut = t > 3.8 ? Math.max(0, 1 - (t - 3.8) / 0.7) : 1;
@@ -109,26 +109,14 @@ function drawFrame(t) {
         
         // Shadow layer
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        ctx.fillText('v0.3.17', W/2 + 4, H * 0.45 + 4);
+        ctx.fillText('v0.3.18', W/2 + 4, H * 0.46 + 4);
         
         // Glow
         ctx.shadowColor = '#7FFFD4';
         ctx.shadowBlur = 25;
         ctx.fillStyle = '#7FFFD4';
-        ctx.fillText('v0.3.17', W/2, H * 0.45);
+        ctx.fillText('v0.3.18', W/2, H * 0.46);
         ctx.shadowBlur = 0;
-    }
-    
-    // "JUST DROPPED" subtitle
-    if (t > 1.2 && t < 4.5) {
-        const fadeIn = easeOutCubic(Math.min((t - 1.2) / 0.5, 1));
-        const fadeOut = t > 3.8 ? Math.max(0, 1 - (t - 3.8) / 0.7) : 1;
-        ctx.globalAlpha = fadeIn * fadeOut;
-        const subSize = Math.min(W * 0.02, 24);
-        ctx.font = `700 ${subSize}px 'Press Start 2P', monospace`;
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#C86F22';
-        ctx.fillText('JUST DROPPED', W/2, H * 0.45 + 60);
     }
     
     // Pixel decoration bars top and bottom
@@ -148,7 +136,7 @@ function drawFrame(t) {
         const badgeW = Math.min(W * 0.25, 280);
         const badgeH = 40;
         const badgeX = W/2 - badgeW/2;
-        const badgeY = H * 0.65;
+        const badgeY = H * 0.72;
         
         // Pixel shadow
         ctx.fillStyle = 'rgba(0,0,0,0.4)';
@@ -165,7 +153,7 @@ function drawFrame(t) {
         ctx.font = `700 ${badgeSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'center';
         ctx.fillStyle = '#fff';
-        ctx.fillText('44 COMMITS', W/2, badgeY + badgeH/2);
+        ctx.fillText('31 COMMITS', W/2, badgeY + badgeH/2);
     }
     
     ctx.globalAlpha = 1;

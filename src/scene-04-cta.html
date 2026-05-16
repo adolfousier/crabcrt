@@ -68,7 +68,7 @@ function drawFrame(t) {
     // All elements centered as a vertical group
     // Total group: box (~300px) + gap(40) + CTA(60) + gap(20) + URL(~20) = ~440px
     // Center that group in the viewport
-    const groupH = 420;
+    const groupH = 450;
     const groupTop = H/2 - groupH/2;
 
     // Box art
@@ -97,7 +97,7 @@ function drawFrame(t) {
         const ctaW = Math.min(W * 0.40, 460);
         const ctaH = 56;
         const ctaX = W/2 - ctaW/2;
-        const ctaY = groupTop + 320;
+        const ctaY = groupTop + 330;
 
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
         ctx.fillRect(ctaX + 4, ctaY + 4, ctaW, ctaH);
@@ -121,13 +121,13 @@ function drawFrame(t) {
         const fadeOut = t > 5 ? Math.max(0, 1 - (t - 5) / 1) : 1;
         ctx.globalAlpha = fadeIn * fadeOut;
 
-        const urlSize = Math.min(W * 0.011, 13);
-        ctx.font = `400 ${urlSize}px 'Press Start 2P', monospace`;
+        const urlSize = Math.min(W * 0.016, 20);
+        ctx.font = `900 ${urlSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'center';
         ctx.fillStyle = '#7FFFD4';
         ctx.shadowColor = '#7FFFD4';
         ctx.shadowBlur = 10;
-        ctx.fillText('www.opencrabs.com', W/2, groupTop + 400);
+        ctx.fillText('www.opencrabs.com', W/2, groupTop + 416);
         ctx.shadowBlur = 0;
     }
 

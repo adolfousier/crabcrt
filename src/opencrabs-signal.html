@@ -24,20 +24,22 @@ window.addEventListener('resize', resize);
 
 const text1Line1 = 'OPENCRABS';
 const text1Line2 = 'P R E S E N T S';
-const text2 = 'v0.3.16 JUST DROPPED';
+const text2 = 'v0.3.19 JUST DROPPED';
 const text3Line1 = 'DOWNLOAD NOW';
 const text3Line2 = 'www.opencrabs.com';
 const highlights = [
-    ['🎛️', 'Mission Control', 'RSI inbox, cron, activity dashboard'],
-    ['⚡', 'Skills system', 'cross-harness SKILL.md, auto-registered as /commands'],
-    ['🤖', 'RSI proposals', 'autonomous tools and commands via inbox'],
+    ['🎬', 'Video vision', 'analyze_video via Gemini, all channels, TUI'],
+    ['🔐', 'Codex OAuth', 'native PKCE device flow, no CLI, no API key'],
+    ['🤖', 'Codex CLI provider', 'GPT-5.5/5.4/5.3-Codex via subprocess'],
+    ['🧠', 'Embedding API', 'OpenAI, Ollama, Jina, any /v1/embeddings'],
+    ['💾', 'FTS5-only mode', 'zero-RAM memory search for VPS'],
+    ['🎛️', 'Mission Control', 'RSI inbox, activity, cron dashboard'],
+    ['⚡', 'Skills system', 'cross-harness SKILL.md, auto /commands'],
+    ['🤖', 'RSI proposals', 'autonomous tools, commands, skills via inbox'],
     ['🧹', 'Async compaction', 'proactive background context cleanup'],
-    ['🔐', 'SSH askpass', 'detects interactive password prompts'],
-    ['🛡️', 'cargo audit CI', 'automated CVE dependency scanning'],
-    ['📋', 'New slash commands', '/security-audit, /cost-estimate'],
-    ['🔧', 'Provider fixes', 'OpenCode persistence, custom dialog clipping'],
-    ['🔍', 'Session search', 'direct SQL query, no more stale index'],
-    ['🧪', '2,522 tests', '+176 from last release']
+    ['🔒', 'Gemini key fix', 'API key moved from URL to header'],
+    ['🔧', 'Cron isolation', 'per-job provider/model, no cross-pollution'],
+    ['🧪', '2,881+ tests', '+400 from last release']
 ];
 const noiseCanvas = document.createElement('canvas');
 const nctx = noiseCanvas.getContext('2d');

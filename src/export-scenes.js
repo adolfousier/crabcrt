@@ -123,7 +123,7 @@ function startServer(dir, port) {
     server.close();
 
     // Encode MP4
-    const outputPath = path.join(__dirname, '..', 'opencrabs-v0.3.17-retro.mp4');
+    const outputPath = path.join(__dirname, '..', 'opencrabs-v0.3.18-retro.mp4');
     console.log(`\nEncoding ${globalFrame} frames with ffmpeg...`);
     execSync(
         `ffmpeg -y -framerate ${FPS} -i "${BASE_DIR}/frame_%05d.png" ` +

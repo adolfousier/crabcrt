@@ -20,16 +20,16 @@ canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; }
 <script>
 const DURATION = 14;
 const features = [
-  ['🎬', 'Video Vision', 'Gemini-native video analysis across all channels'],
-  ['⚡', 'OpenRouter Cache', 'Zero cost for identical requests'],
-  ['🔀', 'Provider Reliability', 'Sticky fallbacks + per-session isolation'],
-  ['📡', 'Streaming Resilience', 'TCP keepalive + partial JSON repair'],
-  ['🧠', 'Context Leak Plugged', 'Claude CLI compaction owned, no more 242%'],
-  ['📺', 'Channel Display Clean', 'Slack/Telegram/Discord show clean text'],
-  ['🗜️', 'Compaction Restored', 'Synchronous + 50KB tool result cap'],
-  ['🛡️', 'Self-Heal Smarter', 'Phantom detectors + RSI escalation'],
-  ['🎮', 'Skills System', '4 built-in skills + help screen section'],
-  ['🔒', 'Security', 'CodeQL #62 cleared, session_ids safe']
+  ['🤖', 'Codex CLI Provider', 'Built-in OpenAI Codex subprocess integration'],
+  ['🔍', 'Repo Audit Skill', 'Language-agnostic repository health checks'],
+  ['🌐', 'Browser Close Tool', 'Close tabs and free CDP sessions cleanly'],
+  ['🔑', 'Cron Webhook Auth', 'Generic Bearer token for HTTP delivery'],
+  ['🔒', 'Gemini Key Security', 'API key moved from URL to secure header'],
+  ['⏱️', 'Handshake Timeout', 'Bumped 30s → 60s for slow providers'],
+  ['📦', 'Module Extractions', 'truncation + feedback + compaction isolated'],
+  ['⚡', 'Stream Reliability', 'No fallback on truncation, errors surfaced'],
+  ['📂', 'Path Slash Fix', 'File paths no longer treated as commands'],
+  ['📊', 'Pipe Table Fix', 'Pipe-delimited rows now hard-broken']
 ];
 
 const bgCanvas = document.getElementById('bg');
@@ -178,7 +178,7 @@ function drawFrame(t) {
     if (t > 0.2) {
         const hdrA = easeOutCubic(Math.min((t - 0.2) / 0.4, 1));
         ctx.globalAlpha = hdrA;
-        const hdrSize = Math.min(W * 0.016, 18);
+        const hdrSize = Math.min(W * 0.028, 32);
         ctx.font = `900 ${hdrSize}px 'Press Start 2P', monospace`;
         ctx.textAlign = 'left';
         ctx.shadowColor = '#7FFFD4';
@@ -186,11 +186,6 @@ function drawFrame(t) {
         ctx.fillStyle = '#7FFFD4';
         ctx.fillText('WHAT\'S NEW', tabX, H * 0.08);
         ctx.shadowBlur = 0;
-        // Version on next line, more spacing
-        ctx.fillStyle = '#C86F22';
-        const subHdrSize = Math.min(W * 0.012, 14);
-        ctx.font = `700 ${subHdrSize}px 'Press Start 2P', monospace`;
-        ctx.fillText('v0.3.17', tabX, H * 0.08 + hdrSize + 12);
     }
 
     // Bottom bar: 44 commits badge — below everything, clean spacing
@@ -216,7 +211,7 @@ function drawFrame(t) {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = '#fff';
-        ctx.fillText('44 COMMITS  •  28 FIXES  •  7 FEATURES', W/2, badgeY + badgeH/2);
+        ctx.fillText('31 COMMITS  •  11 FIXES  •  4 FEATURES', W/2, badgeY + badgeH/2);
     }
 
     ctx.globalAlpha = 1;
