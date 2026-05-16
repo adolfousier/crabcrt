@@ -186,7 +186,7 @@ function drawFrame(t) {
         ctx.shadowBlur = 0;
     }
 
-    // Bottom bar: 44 commits badge — below everything, clean spacing
+    // Bottom bar: 22 commits badge — below everything, clean spacing
     if (t > 2.5) {
         const badgeA = easeOutCubic(Math.min((t - 2.5) / 0.4, 1));
         ctx.globalAlpha = badgeA;
@@ -209,7 +209,7 @@ function drawFrame(t) {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = '#fff';
-        ctx.fillText('31 COMMITS  •  11 FIXES  •  4 FEATURES', W/2, badgeY + badgeH/2);
+        ctx.fillText('22 COMMITS  •  12 FIXES  •  6 FEATURES', W/2, badgeY + badgeH/2);
     }
 
     ctx.globalAlpha = 1;
