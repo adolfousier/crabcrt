@@ -20,16 +20,14 @@ canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; }
 <script>
 const DURATION = 14;
 const features = [
-  ['🤖', 'Codex CLI Provider', 'Built-in OpenAI Codex subprocess integration'],
-  ['🔍', 'Repo Audit Skill', 'Language-agnostic repository health checks'],
-  ['🌐', 'Browser Close Tool', 'Close tabs and free CDP sessions cleanly'],
-  ['🔑', 'Cron Webhook Auth', 'Generic Bearer token for HTTP delivery'],
-  ['🔒', 'Gemini Key Security', 'API key moved from URL to secure header'],
-  ['⏱️', 'Handshake Timeout', 'Bumped 30s → 60s for slow providers'],
-  ['📦', 'Module Extractions', 'truncation + feedback + compaction isolated'],
-  ['⚡', 'Stream Reliability', 'No fallback on truncation, errors surfaced'],
-  ['📂', 'Path Slash Fix', 'File paths no longer treated as commands'],
-  ['📊', 'Pipe Table Fix', 'Pipe-delimited rows now hard-broken']
+  ['🔑', 'Codex OAuth', 'Device-code PKCE auth, no API key needed'],
+  ['🧠', 'Embedding API', 'OpenAI, Ollama, Jina or any /v1/embeddings'],
+  ['💾', 'FTS5-Only Mode', 'Zero-RAM memory search for VPS'],
+  ['🔧', 'Cron Isolation', 'Per-job provider/model, no cross-contamination'],
+  ['📊', 'RSI Accuracy', 'Feedback recorded with correct provider pairs'],
+  ['🔒', 'Codex Models', 'Curated GPT-5 model list, no stray models'],
+  ['📂', 'File Picker Fix', 'Skips .git, 20k cap instead of 5k'],
+  ['🧪', 'CI Reliability', 'Windows paths fixed, Node 24 issues resolved']
 ];
 
 const bgCanvas = document.getElementById('bg');
